@@ -126,11 +126,42 @@ document.addEventListener('DOMContentLoaded', () => {
 
         currentImageBlob = file;
         
-        // Setup Image Preview
+        // Setup Image Preview and Compress
         const reader = new FileReader();
         reader.onload = (e) => {
-            imagePreview.src = e.target.result;
-            runOCR(e.target.result);
+            const img = new Image();
+            img.onload = () => {
+                // Compress giant phone images so Tesseract doesn't crash/hang
+                const canvas = document.createElement('canvas');
+                const MAX_WIDTH = 1200;
+                const MAX_HEIGHT = 1200;
+                let width = img.width;
+                let height = img.height;
+
+                if (width > height) {
+                    if (width > MAX_WIDTH) {
+                        height *= MAX_WIDTH / width;
+                        width = MAX_WIDTH;
+                    }
+                } else {
+                    if (height > MAX_HEIGHT) {
+                        width *= MAX_HEIGHT / height;
+                        height = MAX_HEIGHT;
+                    }
+                }
+
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, width, height);
+
+                const compressedSrc = canvas.toDataURL('image/jpeg', 0.8);
+                imagePreview.src = compressedSrc; // Show compressed preview
+                
+                // Run OCR on the smaller, faster image
+                runOCR(compressedSrc);
+            };
+            img.src = e.target.result;
         };
         reader.readAsDataURL(file);
     };
@@ -138,23 +169,23 @@ document.addEventListener('DOMContentLoaded', () => {
     const runOCR = async (imageSrc) => {
         showSection('loading');
         progressBar.style.width = '0%';
-        loadingText.textContent = 'Initializing Tesseract AI...';
+        loadingText.textContent = 'Initializing AI Engine...';
 
         try {
-            // Use Tesseract CDN instance directly
-            const worker = await Tesseract.createWorker({
+            // Correct Tesseract v5 Syntax
+            const worker = await Tesseract.createWorker('eng', 1, {
                 logger: m => {
                     if (m.status === 'recognizing text') {
                         progressBar.style.width = `${Math.round(m.progress * 100)}%`;
                         loadingText.textContent = `Scanning Card... ${Math.round(m.progress * 100)}%`;
+                    } else {
+                        // Show background downloading statuses so the user knows it's working
+                        loadingText.textContent = m.status;
                     }
                 }
             });
-
-            await worker.loadLanguage('eng');
-            await worker.initialize('eng');
             
-            loadingText.textContent = 'Analyzing text layout...';
+            loadingText.textContent = 'Running Image Analysis...';
             const { data: { text } } = await worker.recognize(imageSrc);
             
             extractedDataCache = text;
@@ -167,7 +198,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (error) {
             console.error('OCR Error:', error);
             showSection('upload');
-            showToast('Text extraction failed. Try another picture.', 'error');
+            showToast('Text extraction failed. Try a smaller or clearer picture.', 'error');
         }
     };
 
