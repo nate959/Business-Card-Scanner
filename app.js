@@ -36,10 +36,17 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentImageBlob = null;
     let extractedDataCache = null; // Storing raw text just in case
     
-    // Initialize Settings from LocalStorage
+    // Initialize Settings from LocalStorage (Hardcoded for immediate use)
     const loadSettings = () => {
-        jotformApiKeyEl.value = localStorage.getItem('jotformApiKey') || '';
-        jotformIdEl.value = localStorage.getItem('jotformId') || '';
+        const apiKey = '47c0eb1c6f312cc0cd4e9c6be1c5f3b8';
+        const formId = '260853094120047';
+        
+        jotformApiKeyEl.value = apiKey;
+        jotformIdEl.value = formId;
+        
+        // Force save to local storage so standard functions pick it up instantly
+        localStorage.setItem('jotformApiKey', apiKey);
+        localStorage.setItem('jotformId', formId);
     };
     
     loadSettings();
