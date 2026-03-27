@@ -366,3 +366,118 @@ button {
 
 .toast.success { background: var(--success-color); color: white; }
 .toast.error { background: var(--error-color); color: white; }
+
+/* --- Live Camera Styles --- */
+.camera-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    min-height: 400px;
+    background: #000;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+#cameraVideo {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    object-fit: cover;
+}
+
+.scanner-overlay {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    /* Create a translucent mask around a clear center rectangle using radial or linear gradients. 
+       Usually an inset box-shadow trick works perfectly */
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.scanner-box {
+    width: 85%;
+    aspect-ratio: 9/5; /* Business card typical ratio roughly */
+    position: relative;
+    /* Clear out the center mask */
+    background: transparent;
+    box-shadow: 0 0 0 9999px rgba(0,0,0,0.5); /* Extends dark shadow to infinity */
+    border-radius: 4px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.scanner-instruction {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    color: rgba(255,255,255,0.7);
+    font-size: 1rem;
+    font-weight: 500;
+    pointer-events: none;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+}
+
+.corner {
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    border-color: #00ff88;
+    border-style: solid;
+    border-width: 0;
+    box-shadow: 0 0 10px #00ff88;
+}
+
+.top-left { top: -2px; left: -2px; border-top-width: 3px; border-left-width: 3px; border-top-left-radius: 8px;}
+.top-right { top: -2px; right: -2px; border-top-width: 3px; border-right-width: 3px; border-top-right-radius: 8px;}
+.bottom-left { bottom: -2px; left: -2px; border-bottom-width: 3px; border-left-width: 3px; border-bottom-left-radius: 8px;}
+.bottom-right { bottom: -2px; right: -2px; border-bottom-width: 3px; border-right-width: 3px; border-bottom-right-radius: 8px;}
+
+.camera-controls {
+    position: absolute;
+    bottom: 0; left: 0; width: 100%;
+    padding: 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: linear-gradient(0deg, rgba(0,0,0,0.8) 0%, transparent 100%);
+}
+
+.camera-exit-btn {
+    background: rgba(0,0,0,0.5);
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-weight: 500;
+    cursor: pointer;
+    backdrop-filter: blur(5px);
+}
+
+.capture-btn {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.3);
+    border: 3px solid white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+
+.capture-inner {
+    width: 52px;
+    height: 52px;
+    background: white;
+    border-radius: 50%;
+    transition: transform 0.1s ease;
+}
+
+.capture-btn:active .capture-inner {
+    transform: scale(0.9);
+}

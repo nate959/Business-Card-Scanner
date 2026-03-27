@@ -3,8 +3,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const dropzone = document.getElementById('dropzone');
     const imageInput = document.getElementById('imageInput');
     
+    // NEW Elements
+    const startCameraBtn = document.getElementById('startCameraBtn');
+    const closeCameraBtn = document.getElementById('closeCameraBtn');
+    const captureBtn = document.getElementById('captureBtn');
+    const cameraVideo = document.getElementById('cameraVideo');
+    const scannerBox = document.getElementById('scannerBox');
+    
     const sections = {
         upload: document.getElementById('uploadSection'),
+        camera: document.getElementById('cameraSection'),
         loading: document.getElementById('loadingSection'),
         editor: document.getElementById('editorSection')
     };
@@ -61,6 +69,78 @@ document.addEventListener('DOMContentLoaded', () => {
         settingsModal.classList.add('hidden');
         showToast('Settings saved successfully', 'success');
     });
+
+    // --- Live Camera Logic ---
+    let stream = null;
+
+    const stopCamera = () => {
+        if (stream) {
+            stream.getTracks().forEach(track => track.stop());
+            stream = null;
+        }
+        cameraVideo.srcObject = null;
+    };
+
+    if (startCameraBtn) {
+        startCameraBtn.addEventListener('click', async () => {
+            try {
+                // Request back camera
+                stream = await navigator.mediaDevices.getUserMedia({
+                    video: { facingMode: 'environment', width: { ideal: 1920 }, height: { ideal: 1080 } }
+                });
+                cameraVideo.srcObject = stream;
+                showSection('camera');
+            } catch (err) {
+                console.error('Camera error:', err);
+                showToast('Unable to access camera. Please check permissions.', 'error');
+            }
+        });
+    }
+
+    if (closeCameraBtn) {
+        closeCameraBtn.addEventListener('click', () => {
+            stopCamera();
+            showSection('upload');
+        });
+    }
+
+    if (captureBtn) {
+        captureBtn.addEventListener('click', () => {
+            cameraVideo.pause(); // Freeze UI momentarily
+            
+            // Calculate dimensions
+            const boxRect = scannerBox.getBoundingClientRect();
+            const videoRect = cameraVideo.getBoundingClientRect();
+            
+            // Calculate ratio between actual video resolution and on-screen size
+            const videoRatioX = cameraVideo.videoWidth / videoRect.width;
+            const videoRatioY = cameraVideo.videoHeight / videoRect.height;
+            
+            // Find absolute coordinates of the box inside the video feed
+            const cropX = (boxRect.left - videoRect.left) * videoRatioX;
+            const cropY = (boxRect.top - videoRect.top) * videoRatioY;
+            const cropWidth = boxRect.width * videoRatioX;
+            const cropHeight = boxRect.height * videoRatioY;
+            
+            const canvas = document.createElement('canvas');
+            canvas.width = cropWidth;
+            canvas.height = cropHeight;
+            const ctx = canvas.getContext('2d');
+            
+            // Draw cropped section to canvas
+            ctx.drawImage(
+                cameraVideo,
+                cropX, cropY, cropWidth, cropHeight, // Source crop
+                0, 0, cropWidth, cropHeight          // Destination on canvas
+            );
+            
+            const croppedImgBase64 = canvas.toDataURL('image/jpeg', 0.9);
+            imagePreview.src = croppedImgBase64;
+            
+            stopCamera();
+            runOCR(croppedImgBase64); // Send ONLY the cropped box to AI!
+        });
+    }
 
     // Drag and Drop Logic
     dropzone.addEventListener('dragover', (e) => {

@@ -27,13 +27,45 @@
             <!-- Step 1: Upload / Camera -->
             <section id="uploadSection" class="card-section active">
                 <div class="dropzone" id="dropzone">
-                    <i class="fas fa-camera main-icon"></i>
-                    <h2>Snap a Business Card</h2>
-                    <p>Tap to take a photo or upload an image</p>
-                    <input type="file" id="imageInput" accept="image/*" capture="environment" hidden>
-                    <button class="primary-btn mt-4" onclick="document.getElementById('imageInput').click()">
-                        Open Camera
+                    <i class="fas fa-id-card main-icon"></i>
+                    <h2>Business Card Scanner</h2>
+                    <p>Use the live scanner or upload an existing photo</p>
+                    
+                    <button id="startCameraBtn" class="primary-btn mt-4">
+                        <i class="fas fa-camera"></i> Open Live Scanner
                     </button>
+                    
+                    <input type="file" id="imageInput" accept="image/*" hidden>
+                    <button class="secondary-btn mt-4" onclick="document.getElementById('imageInput').click()">
+                        <i class="fas fa-upload"></i> Upload Photo instead
+                    </button>
+                </div>
+            </section>
+
+            <!-- Live Camera Section -->
+            <section id="cameraSection" class="card-section hidden">
+                <div class="camera-container">
+                    <video id="cameraVideo" autoplay playsinline></video>
+                    
+                    <!-- Translucent mask and clear middle box -->
+                    <div class="scanner-overlay">
+                        <div class="scanner-box" id="scannerBox">
+                            <div class="scanner-instruction">Line up the card here</div>
+                            <!-- Glowing corners -->
+                            <div class="corner top-left"></div>
+                            <div class="corner top-right"></div>
+                            <div class="corner bottom-left"></div>
+                            <div class="corner bottom-right"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="camera-controls">
+                        <button id="closeCameraBtn" class="camera-exit-btn"><i class="fas fa-times"></i> Cancel</button>
+                        <button id="captureBtn" class="capture-btn">
+                            <div class="capture-inner"></div>
+                        </button>
+                        <div style="width: 80px;"></div> <!-- Spacer so shutter is perfectly centered -->
+                    </div>
                 </div>
             </section>
 
