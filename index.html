@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Business Card Scanner</title>
+    <!-- Modern Typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    
+    <!-- Tesseract CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+    
+    <!-- FontAwesome icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="app-container">
+        <header>
+            <h1>Card Scanner</h1>
+            <button id="settingsBtn" class="icon-btn" title="Settings"><i class="fas fa-cog"></i></button>
+        </header>
+
+        <main>
+            <!-- Step 1: Upload / Camera -->
+            <section id="uploadSection" class="card-section active">
+                <div class="dropzone" id="dropzone">
+                    <i class="fas fa-camera main-icon"></i>
+                    <h2>Snap a Business Card</h2>
+                    <p>Tap to take a photo or upload an image</p>
+                    <input type="file" id="imageInput" accept="image/*" capture="environment" hidden>
+                    <button class="primary-btn mt-4" onclick="document.getElementById('imageInput').click()">
+                        Open Camera
+                    </button>
+                </div>
+            </section>
+
+            <!-- Loading State -->
+            <section id="loadingSection" class="card-section hidden">
+                <div class="loader-container">
+                    <div class="spinner"></div>
+                    <h3 id="loadingText">Scanning Card...</h3>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar" id="progressBar"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Step 2: Editor & Jotform Submission -->
+            <section id="editorSection" class="card-section hidden">
+                <div class="preview-container">
+                    <img id="imagePreview" src="" alt="Card Preview">
+                </div>
+                
+                <form id="extractionForm" class="modern-form">
+                    <div class="form-group">
+                        <label for="nameInput"><i class="fas fa-user"></i> Name</label>
+                        <input type="text" id="nameInput" placeholder="First and Last Name">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="emailInput"><i class="fas fa-envelope"></i> Email</label>
+                        <input type="email" id="emailInput" placeholder="Email Address">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="phoneInput"><i class="fas fa-phone"></i> Phone</label>
+                        <input type="tel" id="phoneInput" placeholder="Phone Number">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="companyInput"><i class="fas fa-building"></i> Company</label>
+                        <input type="text" id="companyInput" placeholder="Company Name">
+                    </div>
+                    
+                    <div class="form-actions mt-4">
+                        <button type="button" class="secondary-btn" id="retakeBtn">Retake</button>
+                        <button type="submit" class="primary-btn" id="submitBtn">
+                            Submit to Jotform <i class="fas fa-paper-plane ml-2"></i>
+                        </button>
+                    </div>
+                </form>
+            </section>
+        </main>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settingsModal" class="modal hidden">
+        <div class="modal-content glass-effect">
+            <div class="modal-header">
+                <h2>Settings</h2>
+                <button id="closeSettings" class="icon-btn"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body">
+                <p class="text-sm mb-4">Configure your Jotform integration here. These settings are stored locally on your device.</p>
+                
+                <div class="form-group">
+                    <label for="jotformApiKey">Jotform API Key</label>
+                    <input type="password" id="jotformApiKey" placeholder="Your API Key">
+                    <small>Found in your Jotform Account Settings > API</small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="jotformId">Jotform Form ID</label>
+                    <input type="text" id="jotformId" placeholder="e.g. 231456789012345">
+                    <small>The numbers at the end of your form's URL</small>
+                </div>
+                
+                <button id="saveSettingsBtn" class="primary-btn w-full mt-4">Save Configuration</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <script src="app.js"></script>
+</body>
+</html>
